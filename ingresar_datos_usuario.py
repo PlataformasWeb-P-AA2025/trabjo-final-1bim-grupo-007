@@ -36,6 +36,12 @@ for u in usuarios_csv.usuario:
         print(usuario)
 '''
 
+# Ingresar datos publicacion
 
+# Ruta publicaciones 
+# /home/nahomi/Downloads/Proyecto-Final-B1/trabjo-final-1bim-grupo-007/DATA/usuarios_publicaciones.csv
+publicaciones_csv = pd.read_csv("DATA/usuarios_publicaciones.csv", delimiter='|')
+
+print(publicaciones_csv)
 
 session.commit()
