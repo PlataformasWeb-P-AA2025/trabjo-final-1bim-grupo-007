@@ -26,7 +26,7 @@ session = Session()
 # Ruta usuarios 
 # /home/nahomi/Downloads/Proyecto-Final-B1/trabjo-final-1bim-grupo-007/DATA/usuarios_red_x.csv
 # Leo el csv con la informacion de usuario
-# usuarios_csv = pd.read_csv("DATA/usuarios_red_x.csv")
+usuarios_csv = pd.read_csv("DATA/usuarios_red_x.csv")
 
 # print(usuarios_csv.usuario)
 
@@ -34,7 +34,7 @@ session = Session()
 # como es una sola columna entonces no es necesario trabajar con 
 # iterrows, solo puedo llamar como a esa columna para crear el 
 # objeto tipo usuario, y agregarlo para enviarlo a la BD
-'''
+
 for u in usuarios_csv.usuario:
         usuario = Usuario(
                 usuarioNombre = u
@@ -42,7 +42,7 @@ for u in usuarios_csv.usuario:
 
         session.add(usuario)
         print(usuario)
-'''
+
 
 # --------------------- #
 # INGRESAR PUBLICACION  #
@@ -51,18 +51,12 @@ for u in usuarios_csv.usuario:
 # Ruta publicaciones 
 # /home/nahomi/Downloads/Proyecto-Final-B1/trabjo-final-1bim-grupo-007/DATA/usuarios_publicaciones.csv
 # Leo el csv de publicaciones
-# publicaciones_csv = pd.read_csv("DATA/usuarios_publicaciones.csv", delimiter='|')
+publicaciones_csv = pd.read_csv("DATA/usuarios_publicaciones.csv", delimiter='|')
 
 # Recupero todos los datos de la tabla de Usuarios
 usuarios_db = session.query(Usuario).all()
 
 # print(usuarios_db)
-
-# Esto recupera el objeto de tipo usuario
-'''
-for e in usuarios_db:
-        print(e)
-'''
 
 # Lo que hago en este for es primero utilizar el iterrow 
 # para recorrer cada fila del dataframe, como aqui si hay 
@@ -72,7 +66,7 @@ for e in usuarios_db:
 # correcta el usuario que se lee del csv con el recuperado de la BD.
 # Asi evito incogruencias, y de paso me evito crear el objeto usuario
 # desde cero.
-'''
+
 for index, row in publicaciones_csv.iterrows():
         # row[0] es el usuario, row [1] es la publicacion
         for e in usuarios_db:
@@ -85,7 +79,7 @@ for index, row in publicaciones_csv.iterrows():
                         print(f"Objeto creado {publicacion}")
                         session.add(publicacion)
                         break
-'''
+
 
 # ---------------- #
 # INGRESAR EMOCION #
@@ -99,13 +93,43 @@ emociones_csv = pd.read_csv("DATA/usuario_publicacion_emocion.csv", delimiter='|
 # Recupero todos los datos de la tabla de Publicacion
 publicacion_db = session.query(Publicacion).all()
 
-'''
-for e in publicacion_db:
-        print(e.usuario)
-'''
-# print(emociones_csv)
+# lista = [] # Esto solo era para comprobar
 
 for index, row in emociones_csv.iterrows():
-        print(row[0], row[1], row[2])
+        # print(row['Usuario'], row['comentario'], row['tipo emocion'])
 
-# session.commit()
+        # Asi como en publicacion, busco en todos los usuarios ya registrados
+        # en la BD con ayuda de un ciclo for, y guardo en una variable el objeto
+        for e in usuarios_db:
+                if (row['Usuario'] == e.usuarioNombre):
+                        # print(f"Son iguales {row[0]} con {e.usuarioNombre}")
+                        usuarioEncontrado = e
+                        # print(usuarioEncontrado)
+                        break
+
+        # Hago lo mismo con publicacion, busco y cuando encuentro la coincidencia
+        # guardo en una variable el objeto
+        for e in publicacion_db:
+                if (row['comentario'] == e.publicacion):
+                        # print(f"Son iguales {row[0]} con {e.publicacion}")
+                        publicacionEncontrada = e
+                        # print(publicacionEncontrada)
+                        break
+
+        # Creo el objeto tipo Reaccion y lo inicializo con las variables 
+        # del csv y las enocontradas 
+        reaccion = Reaccion(
+                        tipo_emocion = row['tipo emocion'],
+                        comentario = row['comentario'],
+                        usuario = usuarioEncontrado,
+                        publicacion = publicacionEncontrada
+                )
+
+        # print(f"Objeto creado {reaccion}")
+        # lista.append(reaccion)
+
+        session.add(reaccion)
+
+# print(len(lista))
+
+session.commit()

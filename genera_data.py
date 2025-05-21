@@ -51,5 +51,7 @@ class Reaccion(Base):
             f"publicacion_id={self.publicacion_id}, tipo_emocion='{self.tipo_emocion}')"
         )
 
+    
+
 
 Base.metadata.create_all(engine)
