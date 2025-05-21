@@ -19,13 +19,21 @@ engine = create_engine(cadena_base_datos)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# ------------------ #
+# INGRESAR USUARIOS  #
+# ------------------ #
+
 # Ruta usuarios 
 # /home/nahomi/Downloads/Proyecto-Final-B1/trabjo-final-1bim-grupo-007/DATA/usuarios_red_x.csv
-usuarios_csv = pd.read_csv("DATA/usuarios_red_x.csv")
+# Leo el csv con la informacion de usuario
+# usuarios_csv = pd.read_csv("DATA/usuarios_red_x.csv")
 
 # print(usuarios_csv.usuario)
 
-# Ingresar datos usuario
+# Ingresar datos usuario, con ayuda de un ciclo for
+# como es una sola columna entonces no es necesario trabajar con 
+# iterrows, solo puedo llamar como a esa columna para crear el 
+# objeto tipo usuario, y agregarlo para enviarlo a la BD
 '''
 for u in usuarios_csv.usuario:
         usuario = Usuario(
@@ -36,12 +44,68 @@ for u in usuarios_csv.usuario:
         print(usuario)
 '''
 
-# Ingresar datos publicacion
+# --------------------- #
+# INGRESAR PUBLICACION  #
+# --------------------- #
 
 # Ruta publicaciones 
 # /home/nahomi/Downloads/Proyecto-Final-B1/trabjo-final-1bim-grupo-007/DATA/usuarios_publicaciones.csv
-publicaciones_csv = pd.read_csv("DATA/usuarios_publicaciones.csv", delimiter='|')
+# Leo el csv de publicaciones
+# publicaciones_csv = pd.read_csv("DATA/usuarios_publicaciones.csv", delimiter='|')
 
-print(publicaciones_csv)
+# Recupero todos los datos de la tabla de Usuarios
+usuarios_db = session.query(Usuario).all()
 
-session.commit()
+# print(usuarios_db)
+
+# Esto recupera el objeto de tipo usuario
+'''
+for e in usuarios_db:
+        print(e)
+'''
+
+# Lo que hago en este for es primero utilizar el iterrow 
+# para recorrer cada fila del dataframe, como aqui si hay 
+# dos columnas entonces no puedo trabajar sin el. 
+# Luego de eso recorro todos los usuarios recuperados
+# de la BD, y esto lo hago para poder iterrelacionar de forma
+# correcta el usuario que se lee del csv con el recuperado de la BD.
+# Asi evito incogruencias, y de paso me evito crear el objeto usuario
+# desde cero.
+'''
+for index, row in publicaciones_csv.iterrows():
+        # row[0] es el usuario, row [1] es la publicacion
+        for e in usuarios_db:
+                if (row[0] == e.usuarioNombre):
+                        # print(f"Son iguales {row[0]} con {e.usuarioNombre}")
+                        publicacion = Publicacion(
+                                        publicacion = row[1],
+                                        usuario = e
+                                )
+                        print(f"Objeto creado {publicacion}")
+                        session.add(publicacion)
+                        break
+'''
+
+# ---------------- #
+# INGRESAR EMOCION #
+# ---------------- #
+
+# Ruta publicaciones 
+# /home/nahomi/Downloads/Proyecto-Final-B1/trabjo-final-1bim-grupo-007/DATA/usuarios_publicaciones.csv
+# Leo el csv de publicaciones
+emociones_csv = pd.read_csv("DATA/usuario_publicacion_emocion.csv", delimiter='|')
+
+# Recupero todos los datos de la tabla de Publicacion
+publicacion_db = session.query(Publicacion).all()
+
+'''
+for e in publicacion_db:
+        print(e.usuario)
+'''
+# print(emociones_csv)
+
+for index, row in emociones_csv.iterrows():
+        print(row[0], row[1], row[2])
+
+# session.commit()
