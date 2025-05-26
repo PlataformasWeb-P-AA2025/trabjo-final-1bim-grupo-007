@@ -1,7 +1,7 @@
 # Obtener un reporte de reacciones en función del número de 
 # veces que fueron usadas
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import and_ # se importa el operador and
 
@@ -24,18 +24,32 @@ session = Session()
 
 # Obtener todos los registros de 
 # la entidad Reaccion
-reacciones = session.query(Reaccion).all()
+# Hay dos formas, usando SQLAlchemy o usando pandas
 
-r_tipo_emocion = []
+# SQLAlchemy: solo imprimir datos, y no se necesita manipular los datos
+resultadosSQL = session.query(
+							# Defino el atributo que quiero recuperar
+							Reaccion.tipo_emocion,
+							# Usa la funcion de agregacion count() de SQL.
+							# para contar las veces en las que aparece cada 
+							# tipo de emocion 
+							func.count(Reaccion.tipo_emocion).label('conteo')
+						).group_by(Reaccion.tipo_emocion).order_by(func.count(Reaccion.tipo_emocion).desc()).all()
 
-for r in reacciones:
-	# print(r.tipo_emocion)
-	r_tipo_emocion.append(r.tipo_emocion) 
+# Pandas: usar en caso de que se quieran hacer graficas, reportes, etc.
+# Se traen los datos de la BD
+resultadosPandas = session.query(Reaccion.tipo_emocion).all()
+# Se convierte la lista de tuplas en una lista plana
+emociones = [r[0] for r in resultadosPandas]
+# Crea el dataframe y agrupa
+df = pd.DataFrame({'emocion': emociones})
+conteo = df['emocion'].value_counts()
 
-# print(r_tipo_emocion)
+print("---------------------------------------")
+print("Reporte de emociones usando sqlalchemy:")
+for emocion, cantidad in resultadosSQL:
+	print(f"{emocion}: {cantidad} veces")
 
-df_tipo_reaccion = pd.DataFrame({'emocion': r_tipo_emocion})
-
-tipo_reaccion_conteo = len(df_tipo_reaccion['emocion'].unique())	
-
-print(tipo_reaccion_conteo)
+print("---------------------------------------")
+print("Reporte de emociones usando Pandas:")
+print(conteo)
