@@ -1,3 +1,7 @@
+// Permitir usar el Docker sin sudo
+
+sudo usermod -aG docker $USER
+
 // Inicializar Docker
 
 docker start postgres-db
