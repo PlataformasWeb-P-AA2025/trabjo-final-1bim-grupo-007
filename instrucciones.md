@@ -1,8 +1,37 @@
-// Permitir usar el Docker sin sudo
+// Por si las dudas se debe eliminar y recrear el contenedor con la base ya creada.
+
+docker rm -f postgres-db
+
+// Inicia el servicio Docker.
+
+sudo systemctl start docker
+
+// Verificar que esté activo.
+
+sudo systemctl status docker
+
+// Correr el contenedor.
+
+docker run --name postgres-db \
+  -e POSTGRES_USER=richard \
+  -e POSTGRES_PASSWORD=123 \
+  -e POSTGRES_DB=richitoyhumita \
+  -p 5432:5432 \
+  -d postgres
+
+// Asegúrate de que el contenedor está corriendo.
+
+docker ps
+
+//Instalar el driver de PostgreSQL en tu entorno Python en caso de no tenerlo.
+
+pip install psycopg2-binary
+
+// Permitir usar el Docker sin sudo.
 
 sudo usermod -aG docker $USER
 
-// Inicializar Docker
+// Inicializar Docker.
 
 docker start postgres-db
 
