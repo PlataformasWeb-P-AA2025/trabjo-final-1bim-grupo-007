@@ -19,7 +19,24 @@ docker run --name postgres-db \
   -p 5432:5432 \
   -d postgres
 
-// Asegúrate de que el contenedor está corriendo.
+//Si se desea pausar y remover el antiguo contenedor se usa:
+
+//Para detenerlo
+docker stop postgres-db 
+
+//Para removerlo
+docker rm postgres-db
+
+// Si quiere conserva el viejo contenedor y usar uno distinto se usa otro nombre.
+
+docker run --name postgres-db-richard \
+  -e POSTGRES_USER=richard \
+  -e POSTGRES_PASSWORD=123 \
+  -e POSTGRES_DB=richitoyhumita \
+  -p 5433:5432 \
+  -d postgres
+    
+// Asegurarse de que el contenedor está corriendo.
 
 docker ps
 
